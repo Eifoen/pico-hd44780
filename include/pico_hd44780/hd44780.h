@@ -22,6 +22,7 @@ typedef struct {
     uint cols;
     uint8_t functions;
     uint8_t display;
+    uint8_t display_mode;
 } hd44780_t;
 
 int hd44780_init(hd44780_t *lcd, uint pin_rw, uint pin_rs, uint pin_e, int data_pins, ...);
@@ -34,9 +35,15 @@ void hd44780_cursor_on(hd44780_t *lcd);
 void hd44780_cursor_off(hd44780_t *lcd);
 void hd44780_blink_on(hd44780_t *lcd);
 void hd44780_blink_off(hd44780_t *lcd);
+void hd44780_autoscroll_on(hd44780_t *lcd);
+void hd44780_autoscroll_off(hd44780_t *lcd);
+void hd44780_flow_lr(hd44780_t *lcd);
+void hd44780_flow_rl(hd44780_t *lcd);
 void hd44780_scroll_left(hd44780_t *lcd);
 void hd44780_scroll_right(hd44780_t *lcd);
-void hd44780_print(hd44780_t *lcd, char* text);
+void hd44780_cursor_set(hd44780_t *lcd, uint col, uint row);
+void hd44780_set_char(hd44780_t *lcd, uint8_t location, uint8_t charmap[]);
+void hd44780_print(hd44780_t *lcd, char* text, size_t size);
 int hd44780_command(hd44780_t *lcd, uint8_t v);
 int hd44780_write(hd44780_t *lcd, uint8_t v);
 

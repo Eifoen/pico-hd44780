@@ -23,6 +23,8 @@
 #define HD44780_CURSORMOVE 0x00
 #define HD44780_MOVERIGHT 0x04
 #define HD44780_MOVELEFT 0x00
+#define HD44780_ENTRYSHIFTINCREMENT 0x01
+#define HD44780_ENTRYLEFT 0x02
 
 // functions
 #define HD44780_8BITMODE 0x10
@@ -65,6 +67,7 @@ int hd44780_init(hd44780_t *lcd, uint pin_rw, uint pin_rs, uint pin_e, int data_
 
     lcd->functions = 0;
     lcd->display = 0;
+    lcd->display_mode = 0;
 
     lcd->e = pin_e;
     lcd->rs = pin_rs;
@@ -136,8 +139,9 @@ int hd44780_begin(hd44780_t *lcd, uint cols, uint rows, bool fancy_font) {
     lcd->display = HD44780_DISPLAYON;
 
     hd44780_display_on(lcd);
+    hd44780_autoscroll_off(lcd);
+    hd44780_flow_lr(lcd);
     return HD44780_SUCCESS;
-
 }
 
 void hd44780_clear(hd44780_t *lcd) {
@@ -198,6 +202,26 @@ void hd44780_blink_off(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_DISPLAYCONTROL | lcd->display);
 }
 
+void hd44780_autoscroll_on(hd44780_t *lcd) {
+    lcd->display_mode |= HD44780_ENTRYSHIFTINCREMENT;
+    hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
+}
+
+void hd44780_autoscroll_off(hd44780_t *lcd) {
+    lcd->display_mode &= ~HD44780_ENTRYSHIFTINCREMENT;
+    hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
+}
+
+void hd44780_flow_lr(hd44780_t *lcd) {
+    lcd->display_mode |= HD44780_ENTRYLEFT;
+    hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
+}
+
+void hd44780_flow_rl(hd44780_t *lcd) {
+    lcd->display_mode &= ~HD44780_ENTRYLEFT;
+    hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
+}
+
 /**
  * Scrolls display to the left
  */
@@ -211,6 +235,14 @@ void hd44780_scroll_left(hd44780_t *lcd) {
  */
 void hd44780_scroll_right(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_CURSORSHIFT | HD44780_DISPLAYMOVE | HD44780_MOVERIGHT);
+}
+
+void hd44780_cursor_set(hd44780_t *lcd, uint col, uint row) {
+    if(row >= lcd->rows) {
+        row = lcd->rows;
+    }
+
+    hd44780_command(lcd, HD44780_SETDDRAMADDR | col + lcd->offsets[row]);
 }
 
 int _hd44780_pin_setup(hd44780_t *lcd) {
@@ -272,6 +304,7 @@ int _hd44780_set_offsets(hd44780_t *lcd, uint row0, uint row1, uint row2, uint r
     lcd->offsets[1] = row1;
     lcd->offsets[2] = row2;
     lcd->offsets[3] = row3;
+    return HD44780_SUCCESS;
 }
 
 int _hd44780_dimensions(hd44780_t *lcd, uint cols, uint rows) {
@@ -283,14 +316,21 @@ int _hd44780_dimensions(hd44780_t *lcd, uint cols, uint rows) {
     return HD44780_SUCCESS;
 }
 
+void hd44780_set_char(hd44780_t *lcd, uint8_t location, uint8_t charmap[]) {
+    location &= 0x7;
+    hd44780_command(lcd, HD44780_SETCGRAMADDR | (location << 3));
+    for(int i = 0; i < 8; i++) {
+        hd44780_write(lcd, charmap[i]);
+    }
+}
+
 /**
  * Prints text to display
  */
-void hd44780_print(hd44780_t *lcd, char* text) {
+void hd44780_print(hd44780_t *lcd, char* text, size_t size) {
     int i = 0;
-    while(!text[i] == 0) {
+    for(int i = 0; i < size; i++){
         hd44780_write(lcd, text[i]);
-        i++;
     }
 }
 
