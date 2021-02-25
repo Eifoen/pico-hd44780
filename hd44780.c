@@ -144,11 +144,21 @@ int hd44780_begin(hd44780_t *lcd, uint cols, uint rows, bool fancy_font) {
     return HD44780_SUCCESS;
 }
 
+/**
+ * Clear the Display
+ * 
+ * @param lcd Display to clear
+ */
 void hd44780_clear(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_CLEARDISPLAY);
     sleep_us(2000);
 }
 
+/**
+ * Set Cursor to 0, 0
+ * 
+ * @param lcd Display on which the cursor will be set
+ */
 void hd44780_home(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_RETURNHOME);
     sleep_us(2000);
@@ -156,6 +166,8 @@ void hd44780_home(hd44780_t *lcd) {
 
 /**
  * Turns LCD display on
+ * 
+ * @param lcd Display that will be turned on
  */
 void hd44780_display_on(hd44780_t *lcd) {
     lcd->display |= HD44780_DISPLAYON;
@@ -164,6 +176,8 @@ void hd44780_display_on(hd44780_t *lcd) {
 
 /**
  * Turns LCD display off
+ * 
+ * @param lcd Display that will be turned off
  */
 void hd44780_display_off(hd44780_t *lcd) {
     lcd->display &= ~HD44780_DISPLAYON;
@@ -172,6 +186,8 @@ void hd44780_display_off(hd44780_t *lcd) {
 
 /**
  * Turns LCD cursor on
+ * 
+ * @param lcd Display on which the cursor will be turned on
  */
 void hd44780_cursor_on(hd44780_t *lcd) {
     lcd->display |= HD44780_CURSORON;
@@ -180,6 +196,8 @@ void hd44780_cursor_on(hd44780_t *lcd) {
 
 /**
  * Turns LCD cursor off
+ * 
+ * @param lcd Display on which the cursor will be turned off
  */
 void hd44780_cursor_off(hd44780_t *lcd) {
     lcd->display &= ~HD44780_CURSORON;
@@ -188,6 +206,8 @@ void hd44780_cursor_off(hd44780_t *lcd) {
 
 /**
  * Turns LCD cursor blinking on
+ * 
+ * @param lcd Display on which cursor blinking will be turned on
  */
 void hd44780_blink_on(hd44780_t *lcd) {
     lcd->display |= HD44780_BLINKON;
@@ -196,6 +216,8 @@ void hd44780_blink_on(hd44780_t *lcd) {
 
 /**
  * Turns LCD cursor blinking off
+ * 
+ * @param lcd Display on which cursor blinking will be turned off
  */
 void hd44780_blink_off(hd44780_t *lcd) {
     lcd->display &= ~HD44780_BLINKON;
@@ -212,11 +234,22 @@ void hd44780_autoscroll_off(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
 }
 
+/**
+ * Set character flow to 'left to right'
+ * 
+ * @param lcd Display on which flow will be set
+ */
 void hd44780_flow_lr(hd44780_t *lcd) {
     lcd->display_mode |= HD44780_ENTRYLEFT;
     hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
 }
 
+
+/**
+ * Set character flow to 'right to left'
+ * 
+ * @param lcd Display on which flow will be set
+ */
 void hd44780_flow_rl(hd44780_t *lcd) {
     lcd->display_mode &= ~HD44780_ENTRYLEFT;
     hd44780_command(lcd, HD44780_ENTRYMODESET | lcd->display_mode);
@@ -224,6 +257,8 @@ void hd44780_flow_rl(hd44780_t *lcd) {
 
 /**
  * Scrolls display to the left
+ * 
+ * @param lcd Display that will be scrolled
  */
 void hd44780_scroll_left(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_CURSORSHIFT | HD44780_DISPLAYMOVE | HD44780_MOVELEFT);
@@ -232,14 +267,27 @@ void hd44780_scroll_left(hd44780_t *lcd) {
 
 /**
  * Scrolls display to the right
+ * 
+ * @param lcd Display that will be scrolled
  */
 void hd44780_scroll_right(hd44780_t *lcd) {
     hd44780_command(lcd, HD44780_CURSORSHIFT | HD44780_DISPLAYMOVE | HD44780_MOVERIGHT);
 }
 
+/**
+ * Set cursor to specified position
+ * 
+ * @param lcd Display on which the cursor will be set
+ * @param col Column where the cursor will be set
+ * @param row Row where the cursor will be set
+ */
 void hd44780_cursor_set(hd44780_t *lcd, uint col, uint row) {
     if(row >= lcd->rows) {
         row = lcd->rows;
+    }
+
+    if(col >= lcd->cols) {
+        col = lcd->cols;
     }
 
     hd44780_command(lcd, HD44780_SETDDRAMADDR | col + lcd->offsets[row]);
