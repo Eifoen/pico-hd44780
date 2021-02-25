@@ -3,37 +3,6 @@
 #include "pico/stdlib.h"
 #include "pico/time.h"
 
-// cmd types
-#define HD44780_CLEARDISPLAY 0x01
-#define HD44780_RETURNHOME 0x02
-#define HD44780_ENTRYMODESET 0x04
-#define HD44780_DISPLAYCONTROL 0x08
-#define HD44780_CURSORSHIFT 0x10
-#define HD44780_FUNCTIONSET 0x20
-#define HD44780_SETCGRAMADDR 0x40
-#define HD44780_SETDDRAMADDR 0x80
-
-// display stuff
-#define HD44780_DISPLAYON 0x04
-#define HD44780_CURSORON 0x02
-#define HD44780_BLINKON 0x01
-
-// scrolling
-#define HD44780_DISPLAYMOVE 0x08
-#define HD44780_CURSORMOVE 0x00
-#define HD44780_MOVERIGHT 0x04
-#define HD44780_MOVELEFT 0x00
-#define HD44780_ENTRYSHIFTINCREMENT 0x01
-#define HD44780_ENTRYLEFT 0x02
-
-// functions
-#define HD44780_8BITMODE 0x10
-#define HD44780_4BITMODE 0x00
-#define HD44780_2LINE 0x08
-#define HD44780_1LINE 0x00
-#define HD44780_5x10DOTS 0x04
-#define HD44780_5x8DOTS 0x00
-
 
 // internal functions
 int _hd44780_pin_setup(hd44780_t *lcd);
